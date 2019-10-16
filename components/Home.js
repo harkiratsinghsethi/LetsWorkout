@@ -26,19 +26,26 @@ export default class Home extends Component {
             data: '',
             loading: false,
             text: '',
-            visible: false
+            visible: false,
+            exercises: []
         };
 
     }
 
     componentDidMount() {
-        let exercise = [];
-        fetch('https://basic-node-api.herokuapp.com/api/getData')
+        let exercises = [];
+        fetch('https://workoutapi-heroku.herokuapp.com/api/getExercise')
             .then((response) => response.json())
             .then((responseJson) => {
+                let jsonArray = [];
 
+                for (let k in responseJson.exercises) {
+                    var jsonData = {};
+                    jsonData['value'] = k;
+                    jsonArray.push(jsonData);
+                }
+                this.setState({exercises: jsonArray})
             });
-        console.log(exercise)
     }
 
 
@@ -51,7 +58,7 @@ export default class Home extends Component {
     }
 
     render() {
-
+        console.log(this.state.exercises);
         let data = [{
             value: 'Arms',
         }, {
@@ -59,7 +66,9 @@ export default class Home extends Component {
         }, {
             value: 'Back',
         },
-            {value: 'Abs'}, {value: 'Shoulder'}, {value: 'Legs'}
+            {value: 'Abs'},
+            {value: 'Shoulder'},
+            {value: 'Legs'}
         ];
 
         return (
@@ -69,7 +78,7 @@ export default class Home extends Component {
                 <View style={styles.container}>
                     <Dropdown
                         label='What would you like to do today?'
-                        data={data}
+                        data={this.state.exercises}
                         baseColor='#ffffff'
                         onChangeText={this.onChangeText}
                         textColor='#000000'
