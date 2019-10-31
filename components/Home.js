@@ -15,8 +15,10 @@ import {
     ImageBackground,
     TouchableOpacity
 } from 'react-native';
+
 import Dialog, {DialogContent} from 'react-native-popup-dialog';
 
+import WorkoutTable from './WorkoutTable'
 import {Dropdown} from 'react-native-material-dropdown';
 
 export default class Home extends Component {
@@ -27,38 +29,57 @@ export default class Home extends Component {
             loading: false,
             text: '',
             visible: false,
-            exercises: []
+            muscle: [],
+            jsonLoad: '',
+            exercisesListSpecificToMuscle: ''
         };
 
     }
 
     componentDidMount() {
-        let exercises = [];
         fetch('https://workoutapi-heroku.herokuapp.com/api/getExercise')
             .then((response) => response.json())
             .then((responseJson) => {
                 let jsonArray = [];
-
+                this.state.jsonLoad = responseJson;
                 for (let k in responseJson.exercises) {
-                    var jsonData = {};
+                    let jsonData = {};
                     jsonData['value'] = k;
                     jsonArray.push(jsonData);
                 }
-                this.setState({exercises: jsonArray})
+                this.setState({muscle: jsonArray})
             });
+
+
     }
 
 
-    onClick() {
-        console.log('clicked')
+    // onClick() {
+    //     console.log('clicked')
+    // }
+
+    createExercisesList(jsonLoad) {
+        let gridViewItemList = [];
+        for (let key in jsonLoad) {
+
+            if (jsonLoad.hasOwnProperty(key)) {
+                let gridViewItemJson = {};
+                gridViewItemJson.key = key;
+                gridViewItemList.push(gridViewItemJson)
+            }
+        }
+        console.log(gridViewItemList);
+        this.setState({
+            exercisesListSpecificToMuscle: gridViewItemList
+        })
     }
 
     onChangeText(text) {
-        console.log(text)
+        this.createExercisesList(this.state.jsonLoad.exercises[text]);
     }
 
     render() {
-        console.log(this.state.exercises);
+        console.log(this.state.muscle);
         let data = [{
             value: 'Arms',
         }, {
@@ -78,69 +99,13 @@ export default class Home extends Component {
                 <View style={styles.container}>
                     <Dropdown
                         label='What would you like to do today?'
-                        data={this.state.exercises}
+                        data={this.state.muscle}
                         baseColor='#ffffff'
-                        onChangeText={this.onChangeText}
+                        onChangeText={this.onChangeText.bind(this)}
                         textColor='#000000'
                         selectedItemColor='#000000'
                     />
-                    {/*<TouchableOpacity onPress={() => {*/}
-                    {/*this.setState({visible: true});*/}
-                    {/*}}>*/}
-
-                    {/*<View style={styles.forearm}>*/}
-                    {/*</View>*/}
-                    {/*</TouchableOpacity>*/}
-
-
-                    {/*<View style={styles.forearm}>*/}
-                    {/*</View>*/}
-                    {/*<View style={styles.bicep}>*/}
-                    {/*</View>*/}
-                    {/*<View style={styles.tricep}>*/}
-                    {/*</View>*/}
-                    {/*<View style={styles.shoulder}>*/}
-                    {/*</View>*/}
-                    {/*<TouchableOpacity onPress={() => {*/}
-                    {/*this.setState({visible: true});*/}
-                    {/*}}>*/}
-                    {/*<View style={styles.pecs}*/}
-                    {/*onPress={() => {*/}
-                    {/*this.setState({visible: true});*/}
-                    {/*}}>*/}
-                    {/*</View>*/}
-                    {/*</TouchableOpacity>*/}
-
-                    {/*<View style={styles.abs}>*/}
-                    {/*</View>*/}
-                    {/*<View style={styles.thigh}>*/}
-                    {/*</View>*/}
-                    {/*<View style={styles.vastusthigh}>*/}
-                    {/*</View>*/}
-                    {/*<View style={styles.calves}>*/}
-                    {/*</View>*/}
-                    {/*<View style={styles.innerthigh}>*/}
-                    {/*</View>*/}
-                    {/*<View style={styles.sides} onStartShouldSetResponder={() => this.setState({visible: true})}*/}
-                    {/*>*/}
-                    {/*</View>*/}
-
-                    {/*<Dialog*/}
-                    {/*visible={this.state.visible}*/}
-                    {/*onTouchOutside={() => {*/}
-                    {/*this.setState({visible: false});*/}
-                    {/*}}*/}
-                    {/*>*/}
-                    {/*<DialogContent>*/}
-                    {/*<Text>Pecs</Text>*/}
-                    {/*</DialogContent>*/}
-                    {/*</Dialog>*/}
-                    {/*<Button*/}
-                    {/*title="Show Dialog"*/}
-                    {/*onPress={() => {*/}
-                    {/*this.setState({visible: true});*/}
-                    {/*}}*/}
-                    {/*/>*/}
+                    <WorkoutTable excercises={this.state.exercisesListSpecificToMuscle}/>
                 </View>
 
             </ImageBackground>
