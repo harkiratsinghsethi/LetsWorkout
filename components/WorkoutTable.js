@@ -13,7 +13,10 @@ import {
     KeyboardAvoidingView,
     ImageBackground,
     TouchableOpacity,
-    Alert
+    Alert,
+    Animated,
+    Easing,
+    SafeAreaView
 } from 'react-native';
 
 
@@ -21,6 +24,7 @@ export default class WorkoutTable extends Component {
     constructor() {
 
         super();
+        this.delayValue = 500;
         this.state = {
             GridViewItems: [
                 {key: 'One'},
@@ -44,24 +48,11 @@ export default class WorkoutTable extends Component {
                 {key: 'Nineteen'},
                 {key: 'Twenty'}
             ]
-
+            ,
+            animatedValue: new Animated.Value(0),
         };
     }
 
-    componentDidMount() {
-        fetch('https://workoutapi-heroku.herokuapp.com/api/getExercise')
-            .then((response) => response.json())
-            .then((responseJson) => {
-                let jsonArray = [];
-
-                for (let k in responseJson.exercises) {
-                    let jsonData = {};
-                    jsonData['value'] = k;
-                    jsonArray.push(jsonData);
-                }
-                this.setState({exercises: jsonArray})
-            });
-    }
 
     GetGridViewItem(item) {
 
@@ -69,26 +60,67 @@ export default class WorkoutTable extends Component {
 
     }
 
+    startAnimation() {
+        console.log('start animation', this.state.animatedValue, this.delayValue);
+
+        Animated.spring(this.state.animatedValue, {
+            toValue: 1,
+            tension: 40,
+            useNativeDriver: true
+        }).start();
+    }
+
+    componentDidMount() {
+        console.log('did mount', this.state.animatedValue);
+        this.delayValue = 500;
+
+        this.startAnimation();
+    }
+
+    componentDidUpdate(prevProps) {
+        this.delayValue = 500;
+
+        console.log('did update', this.state.animatedValue);
+        this.startAnimation();
+
+    }
+
+    _renderItem = ({item}) => {
+        this.delayValue = this.delayValue + 500;
+        const translateX = this.state.animatedValue.interpolate({
+            inputRange: [0, 1],
+            outputRange: [this.delayValue, 1]
+        });
+        return (
+            <Animated.View
+                style={[styles.GridViewBlockStyle, {transform: [{translateX}]}]}
+            >
+                <View>
+                    <Text style={styles.GridViewInsideTextItemStyle}
+                          onPress={this.GetGridViewItem.bind(this, item.key)}> {item.key} </Text>
+
+                </View>
+            </Animated.View>
+        )
+    };
+
     render() {
+        console.log(this.props.excercises);
+
         return (
 
-            <View style={styles.MainContainer}>
+            <SafeAreaView style={styles.MainContainer}>
+
                 <FlatList
                     data={this.props.excercises}
+                    x
+                    renderItem={this._renderItem}
 
-                    renderItem={
-                        ({item}) => <View style={styles.GridViewBlockStyle}>
-
-                            <Text style={styles.GridViewInsideTextItemStyle}
-                                  onPress={this.GetGridViewItem.bind(this, item.key)}> {console.log(item)}{item.key} </Text>
-
-                        </View>}
 
                     numColumns={2}
 
                 />
-
-            </View>
+            </SafeAreaView>
 
         );
 
@@ -116,8 +148,14 @@ const styles = StyleSheet.create({
         margin: 5,
         backgroundColor: '#00BCD4'
 
-    }
-    ,
+    },
+    button: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 10,
+        borderColor: 'black',
+        borderWidth: 1
+    },
 
     GridViewInsideTextItemStyle: {
 

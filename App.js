@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 
 import Home from './components/Home'
+
 import {
     Header,
     LearnMoreLinks,
@@ -24,10 +25,11 @@ import {
     DebugInstructions,
     ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+import MainContainer from "./components/MainContainer";
 
 const App: () => React$Node = () => {
     return (
-        <Home/>
+        <MainContainer/>
     );
 };
 

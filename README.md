@@ -39,5 +39,5 @@ This is code base of react-native mobile app "LetsWorkout"
 )
 
 #3
-![image](https://user-images.githubusercontent.com/56528325/66902007-8524a580-f01d-11e9-9a1b-4382e6fa669f.png
+![image](https://user-images.githubusercontent.com/56528325/67933274-74faf180-fbeb-11e9-9a48-4c45622e60bf.png
 )

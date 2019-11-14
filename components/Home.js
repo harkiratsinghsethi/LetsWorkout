@@ -13,6 +13,7 @@ import {
     ScrollView,
     KeyboardAvoidingView,
     ImageBackground,
+    Animated,
     TouchableOpacity
 } from 'react-native';
 
@@ -21,9 +22,12 @@ import Dialog, {DialogContent} from 'react-native-popup-dialog';
 import WorkoutTable from './WorkoutTable'
 import {Dropdown} from 'react-native-material-dropdown';
 
+let scaleValue = new Animated.Value(0);
+
 export default class Home extends Component {
     constructor() {
         super();
+
         this.state = {
             data: '',
             loading: false,
@@ -31,7 +35,8 @@ export default class Home extends Component {
             visible: false,
             muscle: [],
             jsonLoad: '',
-            exercisesListSpecificToMuscle: ''
+            exercisesListSpecificToMuscle: [],
+            isExerciseSelected: false
         };
 
     }
@@ -68,30 +73,49 @@ export default class Home extends Component {
                 gridViewItemList.push(gridViewItemJson)
             }
         }
-        console.log(gridViewItemList);
         this.setState({
-            exercisesListSpecificToMuscle: gridViewItemList
+            exercisesListSpecificToMuscle: gridViewItemList,
+            isExerciseSelected: true
         })
     }
 
     onChangeText(text) {
-        this.createExercisesList(this.state.jsonLoad.exercises[text]);
+        this.createExercisesList(this.state.jsonLoad.exercises[text])
     }
 
-    render() {
-        console.log(this.state.muscle);
-        let data = [{
-            value: 'Arms',
-        }, {
-            value: 'Chest',
-        }, {
-            value: 'Back',
+    static navigationOptions = {
+        title: 'Home',
+        headerStyle: {height: 30,
+            backgroundColor: '#00BCD4',
         },
-            {value: 'Abs'},
-            {value: 'Shoulder'},
-            {value: 'Legs'}
-        ];
+        //  headerTintColor: '#0ff',
+        headerTitleStyle: {
+            fontWeight: '',
+        }
+    };
 
+    render() {
+        console.log(' render home...');
+        if (this.state.isExerciseSelected) {
+            return (
+                <ImageBackground
+                    source={require('../images/fullbody.jpg')}
+                    style={styles.bgImage}>
+                    <View style={styles.container}>
+                        <Dropdown
+                            label='What would you like to do today?'
+                            data={this.state.muscle}
+                            baseColor='#ffffff'
+                            onChangeText={this.onChangeText.bind(this)}
+                            textColor='#000000'
+                            selectedItemColor='#000000'
+                        />
+                        <WorkoutTable excercises={this.state.exercisesListSpecificToMuscle}/>
+                    </View>
+
+                </ImageBackground>
+            )
+        }
         return (
             <ImageBackground
                 source={require('../images/fullbody.jpg')}
@@ -105,11 +129,11 @@ export default class Home extends Component {
                         textColor='#000000'
                         selectedItemColor='#000000'
                     />
-                    <WorkoutTable excercises={this.state.exercisesListSpecificToMuscle}/>
                 </View>
 
             </ImageBackground>
         )
+
 
     }
 }
